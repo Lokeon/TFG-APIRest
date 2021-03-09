@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 
 //Import Routes
 const authRoute = require("./routes/auth");
+const ratesRoute = require("./routes/rates");
 
 dotenv.config();
 
@@ -20,5 +21,6 @@ app.use(express.json());
 
 //Route Middleware - Prefix
 app.use("/api/user", authRoute);
+app.use("/api/rates", ratesRoute);
 
 app.listen(3000, () => console.log("Server up and running"));
