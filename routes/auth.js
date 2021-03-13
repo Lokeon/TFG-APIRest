@@ -25,8 +25,6 @@ router.post("/register", async (req, res) => {
   });
   try {
     const savedUser = await user.save();
-    //for security reasons just sent the id for confirmation
-    res.send({ userId: user._id });
   } catch (e) {
     res.status(400).send(e);
   }
@@ -53,7 +51,8 @@ router.post("/login", async (req, res) => {
     process.env.TOKEN_SECRET
   );
 
-  res.header("auth-token", token).send(token);
+  res.header("auth-token", token);
+  res.send(user._id);
 });
 
 module.exports = router;
