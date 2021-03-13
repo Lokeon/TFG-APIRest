@@ -6,6 +6,7 @@ const dotenv = require("dotenv");
 //Import Routes
 const authRoute = require("./routes/auth");
 const ratesRoute = require("./routes/rates");
+const userRoute = require("./routes/users");
 
 dotenv.config();
 
@@ -20,7 +21,8 @@ mongoose.connect(
 app.use(express.json());
 
 //Route Middleware - Prefix
-app.use("/api/user", authRoute);
+app.use("/api/users", authRoute);
 app.use("/api/rates", ratesRoute);
+app.use("/api/users", userRoute);
 
 app.listen(3000, () => console.log("Server up and running"));
