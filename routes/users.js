@@ -14,12 +14,12 @@ router.get("/:id", verify, async (req, res) => {
 
 //GET all Users
 router.get("/", verify, async (req, res) => {
-    try {
-      const users = await User.find();
-      res.send(users);
-    } catch (error) {
-      res.status(400).send(error);
-    }
-  });
+  try {
+    const users = await User.find();
+    res.send(users);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
 
 module.exports = router;
