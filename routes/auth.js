@@ -2,6 +2,7 @@ const router = require("express").Router();
 const User = require("../model/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const fs = require("fs").promises;
 const {
   registerValidation,
   loginValidation,
@@ -20,15 +21,18 @@ router.post("/register", async (req, res) => {
 
   const salt = await bcrypt.genSalt(10);
   const hashPassword = await bcrypt.hash(req.body.password, salt);
+  const file = await fs.readFile("./defaultAvatar/ic_avatar.jpeg", "base64");
 
   const user = new User({
     username: req.body.username,
     email: req.body.email,
     password: hashPassword,
+    avatar: file,
   });
   try {
     const savedUser = await user.save();
-    res.send({ userId: user._id });
+    res.send(savedUser);
+    //{ userId: user._id }
   } catch (e) {
     res.status(400).send(e);
   }
