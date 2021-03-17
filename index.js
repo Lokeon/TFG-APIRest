@@ -18,7 +18,7 @@ mongoose.connect(
 );
 
 //Middleware
-app.use(express.json());
+app.use(express.json({limit: '100mb'}));
 
 //Route Middleware - Prefix
 app.use("/api/users", authRoute);

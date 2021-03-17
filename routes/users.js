@@ -5,7 +5,7 @@ const verify = require("./verifyToken");
 const multer = require("multer");
 const avatar = multer({
   limits: {
-    filesize: 1000000,
+    filesize: 5000000,
   },
   fileFilter(req, file, cb) {
     if (!file.originalname.match(/\.(jpg|png|JPG|PNG|JPEG|jpeg)$/))
@@ -52,14 +52,16 @@ router.patch("/password", verify, async (req, res) => {
   }
 });
 
-// POST User's Avatar
-router.post("/avatar", verify, avatar.single("avatar"), async (req, res) => {
+// PATCH User's Avatar
+router.patch("/avatar", verify, avatar.single("avatar"), async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req.user });
-    user.avatar = req.file.buffer.toString("base64");
-
-    await user.save();
-
+    const updateUser = await User.updateOne(
+      { _id: req.user },
+      {
+        $set: { avatar: req.file.buffer.toString("base64") },
+      }
+    );
+    
     res.send(req.user);
   } catch (error) {
     res.status(400).send(error);
