@@ -18,10 +18,10 @@ mongoose.connect(
 );
 
 //Middleware
-app.use(express.json({limit: '100mb'}));
+app.use(express.json({ limit: "100mb" }));
 
 //Route Middleware - Prefix
-app.use("/api/users", authRoute);
+app.use("/api/auth", authRoute);
 app.use("/api/rates", ratesRoute);
 app.use("/api/users", userRoute);
 
