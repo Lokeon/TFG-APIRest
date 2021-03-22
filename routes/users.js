@@ -24,6 +24,20 @@ router.get("/", verify, async (req, res) => {
   }
 });
 
+//GET all Users Admin version
+router.get("/admin", verify, async (req, res) => {
+  try {
+    const users = await User.find();
+    res.send({
+      username: users.username,
+      email: users.email,
+      date: users.date,
+    });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 // GET One user
 router.get("/user", verify, async (req, res) => {
   try {
@@ -61,7 +75,7 @@ router.patch("/avatar", verify, avatar.single("avatar"), async (req, res) => {
         $set: { avatar: req.file.buffer.toString("base64") },
       }
     );
-    
+
     res.send(req.user);
   } catch (error) {
     res.status(400).send(error);

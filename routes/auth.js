@@ -103,16 +103,7 @@ router.post("/login/admins", async (req, res) => {
   const validPass = await bcrypt.compare(req.body.password, admin.password);
   if (!validPass) return res.status(400).send("Invalid password");
 
-  //Create jwt token
-  const token = jwt.sign(
-    {
-      _id: admin._id,
-    },
-    process.env.TOKEN_SECRET
-  );
-
-  res.header("auth-token", token);
-  res.send(token + " " + admin._id);
+  res.send(admin._id);
 });
 
 module.exports = router;
