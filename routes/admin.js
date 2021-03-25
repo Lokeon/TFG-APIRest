@@ -44,6 +44,18 @@ router.delete("/users/delete/:id", async (req, res) => {
   }
 });
 
+//GET one Game
+router.get("/games/:id", async (req, res) => {
+  try {
+    const games = await Game.findOne({
+      _id: req.params.id,
+    });
+    res.send(games);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 //GET all Games
 router.get("/games", async (req, res) => {
   try {
@@ -85,23 +97,36 @@ router.delete("/games/delete/:id", async (req, res) => {
   }
 });
 
-// Update User's Avatar
-router.post("/games/update/:id", image.single("image"), async (req, res) => {
+// Update Game Avatar
+router.put("/games/update/:id", async (req, res) => {
   try {
-    if (req.file.buffer != undefined) {
-      const gameUpdated = await Game.updateOne(
-        { _id: req.params.id },
-        {
-          $set: {
-            name: req.body.name,
-            genre: req.body.genre,
-            description: req.body.description,
-            image: req.file.buffer.toString("base64"),
-          },
-        }
-      );
-    }
+    const gameUpdated = await Game.updateOne(
+      { _id: req.params.id },
+      {
+        $set: {
+          name: req.body.name,
+          genre: req.body.genre,
+          description: req.body.description,
+        },
+      }
+    );
     res.send("Game update");
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// PATCH User's Avatar
+router.patch("/games/image/:id", image.single("image"), async (req, res) => {
+  try {
+    const gameUpdate = await Game.updateOne(
+      { _id: req.params.id },
+      {
+        $set: { image: req.file.buffer.toString("base64") },
+      }
+    );
+
+    res.send("Image updated");
   } catch (error) {
     res.status(400).send(error);
   }
