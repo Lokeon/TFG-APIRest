@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-//GET all Users Admin version
+//GET all Users
 router.get("/users", async (req, res) => {
   try {
     const users = await User.find();
@@ -34,11 +34,21 @@ router.get("/users", async (req, res) => {
   }
 });
 
-//DELETE User Admin version
+//DELETE User
 router.delete("/users/delete/:id", async (req, res) => {
   try {
     const userDelete = await User.deleteOne({ _id: req.params.id });
     res.send("User Deleted");
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+//GET all Games
+router.get("/games", async (req, res) => {
+  try {
+    const games = await Game.find();
+    res.send(games);
   } catch (error) {
     res.status(400).send(error);
   }
@@ -65,11 +75,33 @@ router.post("/games/game", image.single("image"), async (req, res) => {
   }
 });
 
-//GET all Games
-router.get("/", async (req, res) => {
+//DELETE Game
+router.delete("/games/delete/:id", async (req, res) => {
   try {
-    const games = await Games.find();
-    res.send(games);
+    const gameDeleted = await Game.deleteOne({ _id: req.params.id });
+    res.send("Game Deleted");
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// Update User's Avatar
+router.post("/games/update/:id", image.single("image"), async (req, res) => {
+  try {
+    if (req.file.buffer != undefined) {
+      const gameUpdated = await Game.updateOne(
+        { _id: req.params.id },
+        {
+          $set: {
+            name: req.body.name,
+            genre: req.body.genre,
+            description: req.body.description,
+            image: req.file.buffer.toString("base64"),
+          },
+        }
+      );
+    }
+    res.send("Game update");
   } catch (error) {
     res.status(400).send(error);
   }
