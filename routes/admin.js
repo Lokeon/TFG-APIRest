@@ -52,7 +52,7 @@ router.get("/games/:id", async (req, res) => {
     });
     res.send(games);
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send("Game doesn't exist");
   }
 });
 
@@ -66,7 +66,7 @@ router.get("/games", async (req, res) => {
   }
 });
 
-//POST Games Admin version
+//POST Games
 router.post("/games/game", image.single("image"), async (req, res) => {
   const gameExits = await Game.findOne({
     name: req.body.name,
@@ -97,7 +97,7 @@ router.delete("/games/delete/:id", async (req, res) => {
   }
 });
 
-// Update Game Avatar
+// Update Game Info
 router.put("/games/update/:id", async (req, res) => {
   try {
     const gameUpdated = await Game.updateOne(
@@ -116,7 +116,7 @@ router.put("/games/update/:id", async (req, res) => {
   }
 });
 
-// PATCH User's Avatar
+// PATCH Game Image
 router.patch("/games/image/:id", image.single("image"), async (req, res) => {
   try {
     const gameUpdate = await Game.updateOne(
