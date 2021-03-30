@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const User = require("../model/User");
+const Game = require("../model/Games");
 const verify = require("./verifyToken");
 const multer = require("multer");
 const avatar = multer({
@@ -63,6 +64,16 @@ router.patch("/avatar", verify, avatar.single("avatar"), async (req, res) => {
     );
 
     res.send(req.user);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+//GET all Games
+router.get("/games", verify, async (req, res) => {
+  try {
+    const games = await Game.find();
+    res.send(games);
   } catch (error) {
     res.status(400).send(error);
   }

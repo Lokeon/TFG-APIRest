@@ -6,16 +6,16 @@ const dotenv = require("dotenv");
 
 //Import Routes
 const authRoute = require("./routes/auth");
-const ratesRoute = require("./routes/rates");
 const userRoute = require("./routes/users");
 const adminRoute = require("./routes/admin");
+const guestRoute = require("./routes/guest");
 
 dotenv.config();
 
 //Connect to MongoDB
 mongoose.connect(
   process.env.DB_CONNECT,
-  { useNewUrlParser: true, useUnifiedTopology: true },
+  { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true },
   () => console.log("Connected to MongoDB")
 );
 
@@ -25,8 +25,8 @@ app.use(express.json({ limit: "100mb" }));
 
 //Route Middleware - Prefix
 app.use("/api/auth", authRoute);
-app.use("/api/rates", ratesRoute);
 app.use("/api/users", userRoute);
 app.use("/api/admins", adminRoute);
+app.use("/api/guest", guestRoute);
 
 app.listen(3000, () => console.log("Server up and running"));
