@@ -3,12 +3,17 @@ const User = require("../model/User");
 const Admin = require("../model/Admin");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv").config();
 const fs = require("fs").promises;
 const {
   registerUserValidation,
   registerAdminValidation,
   loginValidation,
 } = require("../validation/validation");
+const {
+  sendConfirmationEmail,
+  confirmedEmail,
+} = require("../config/nodemailer.config");
 
 // Register User
 router.post("/register/users", async (req, res) => {
@@ -24,15 +29,27 @@ router.post("/register/users", async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   const hashPassword = await bcrypt.hash(req.body.password, salt);
   const file = await fs.readFile("./defaultAvatar/ic_avatar.jpeg", "base64");
+  const token = jwt.sign(
+    {
+      email: req.body.email,
+    },
+    process.env.TOKEN_SECRET
+  );
 
   const user = new User({
     username: req.body.username,
     email: req.body.email,
     password: hashPassword,
+    confirmationCode: token,
     avatar: file,
   });
   try {
     const savedUser = await user.save();
+    sendConfirmationEmail(
+      req.body.username,
+      req.body.email,
+      token
+    );
     res.send(savedUser);
   } catch (e) {
     res.status(400).send(e);
@@ -65,6 +82,26 @@ router.post("/register/admins", async (req, res) => {
   }
 });
 
+//Confirm Email
+router.get("/confirm/:code", async (req, res) => {
+  try {
+    const user = await User.findOne({ confirmationCode: req.params.code });
+    if (!user) return res.status(400).send("User not found");
+    const verified = jwt.verify(
+      user.confirmationCode,
+      process.env.TOKEN_SECRET
+    );
+    if (!verified) return res.status(400).send("User not verified");
+
+    user.isConfirmed = true;
+    const savedUser = await user.save();
+    confirmedEmail(user.username, user.email);
+    res.send("User confimed");
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 // Login Users
 router.post("/login/users", async (req, res) => {
   const { error } = loginValidation(req.body);
@@ -74,20 +111,23 @@ router.post("/login/users", async (req, res) => {
     username: req.body.username,
   });
   if (!user) return res.status(400).send("Username doesn't exists");
+  if (user.isConfirmed) {
+    const validPass = await bcrypt.compare(req.body.password, user.password);
+    if (!validPass) return res.status(400).send("Invalid password");
 
-  const validPass = await bcrypt.compare(req.body.password, user.password);
-  if (!validPass) return res.status(400).send("Invalid password");
+    //Create jwt token
+    const token = jwt.sign(
+      {
+        _id: user._id,
+      },
+      process.env.TOKEN_SECRET
+    );
 
-  //Create jwt token
-  const token = jwt.sign(
-    {
-      _id: user._id,
-    },
-    process.env.TOKEN_SECRET
-  );
-
-  res.header("auth-token", token);
-  res.send(token + " " + user._id);
+    res.header("auth-token", token);
+    res.send(token + " " + user._id);
+  } else {
+    res.status(400).send("Account pending to verify by email");
+  }
 });
 
 // Login Admin

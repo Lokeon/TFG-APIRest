@@ -18,13 +18,21 @@ const userSchema = new mongoose.Schema({
     max: 1024,
     min: 6,
   },
-  date: {
-    type: Date,
-    default: Date.now,
+  confirmationCode: {
+    type: String,
+    unique: true,
+  },
+  isConfirmed: {
+    type: Boolean,
+    default: false,
   },
   avatar: {
     type: String,
     required: true,
+  },
+  date: {
+    type: Date,
+    default: Date.now,
   },
 });
 
