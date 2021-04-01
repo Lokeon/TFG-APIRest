@@ -33,4 +33,16 @@ router.get("/games/:text", async (req, res) => {
   }
 });
 
+//GET one Game
+router.get("/game/:id", async (req, res) => {
+  try {
+    const games = await Game.findOne({
+      _id: req.params.id,
+    });
+    res.send(games);
+  } catch (error) {
+    res.status(400).send("Game doesn't exist");
+  }
+});
+
 module.exports = router;
