@@ -5,6 +5,7 @@ const Game = require("../model/Games");
 const Rate = require("../model/Rate");
 const verify = require("./verifyToken");
 const multer = require("multer");
+const { find } = require("../model/User");
 const avatar = multer({
   limits: {
     filesize: 5000000,
@@ -93,17 +94,51 @@ router.get("/game/:id", verify, async (req, res) => {
 });
 
 router.post("/rate", verify, async (req, res) => {
-  const rate = new Rate({
-    score: req.body.score,
-    idUser: req.body.idUser,
-    idGame: req.body.idGame,
-    nameGame: req.body.nameGame
-  });
   try {
-    const savedRate = await rate.save();
-    res.send(savedRate);
-  } catch (e) {
-    res.status(400).send(e);
+    const findRate = await Rate.findOne({
+      idUser: req.body.idUser,
+      idGame: req.body.idGame,
+      nameGame: req.body.nameGame,
+    });
+    if (!findRate) {
+      const rate = new Rate({
+        score: req.body.score,
+        idUser: req.body.idUser,
+        idGame: req.body.idGame,
+        nameGame: req.body.nameGame,
+      });
+      const savedRate = await rate.save();
+      res.send(savedRate);
+    } else {
+      if (findRate.score != req.body.score) {
+        findRate.score = req.body.score;
+
+        const savedFRate = await findRate.save();
+        res.status(201).send(savedFRate);
+      }
+    }
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+router.get("/rated/:idUser/:idGame", async (req, res) => {
+  try {
+    const findRate = await Rate.findOne({
+      idUser: req.params.idUser,
+      idGame: req.params.idGame,
+    });
+    if (findRate) {
+      res.send(
+        JSON.stringify({
+          score: findRate.score,
+        })
+      );
+    } else {
+      res.status(400).send("Game not found");
+    }
+  } catch (error) {
+    res.status(400).send(error);
   }
 });
 
