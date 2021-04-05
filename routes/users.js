@@ -2,6 +2,7 @@ const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const User = require("../model/User");
 const Game = require("../model/Games");
+const Rate = require("../model/Rate");
 const verify = require("./verifyToken");
 const multer = require("multer");
 const avatar = multer({
@@ -88,6 +89,21 @@ router.get("/game/:id", verify, async (req, res) => {
     res.send(games);
   } catch (error) {
     res.status(400).send("Game doesn't exist");
+  }
+});
+
+router.post("/rate", verify, async (req, res) => {
+  const rate = new Rate({
+    score: req.body.score,
+    idUser: req.body.idUser,
+    idGame: req.body.idGame,
+    nameGame: req.body.nameGame
+  });
+  try {
+    const savedRate = await rate.save();
+    res.send(savedRate);
+  } catch (e) {
+    res.status(400).send(e);
   }
 });
 
