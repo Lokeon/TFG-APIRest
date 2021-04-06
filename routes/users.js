@@ -83,13 +83,47 @@ router.get("/games", verify, async (req, res) => {
 
 //GET one Game
 router.get("/game/:id", verify, async (req, res) => {
-  try {
-    const games = await Game.findOne({
-      _id: req.params.id,
+  const games = await Game.findOne({
+    _id: req.params.id,
+  });
+
+  const findRate = await Rate.findOne({
+    idGame: req.params.id,
+  });
+
+  if (!findRate) {
+    res.send({
+      _id: games._id,
+      name: games.name,
+      genre: games.genre,
+      description: games.description,
+      image: games.image,
+      avg: 0.0,
+      rates: 0,
     });
-    res.send(games);
-  } catch (error) {
-    res.status(400).send("Game doesn't exist");
+  } else {
+    const avgGame = await Rate.aggregate()
+      .match({
+        idGame: req.params.id,
+      })
+      .group({
+        _id: null,
+        avgs: { $avg: "$score" },
+      });
+
+    const rated = await Rate.countDocuments({
+      idGame: req.params.id,
+    });
+
+    res.send({
+      _id: games._id,
+      name: games.name,
+      genre: games.genre,
+      description: games.description,
+      image: games.image,
+      avg: avgGame[0].avgs,
+      rates: rated,
+    });
   }
 });
 
@@ -122,18 +156,17 @@ router.post("/rate", verify, async (req, res) => {
   }
 });
 
-router.get("/rated/:idUser/:idGame", async (req, res) => {
+router.get("/rated/:idUser/:idGame", verify, async (req, res) => {
   try {
     const findRate = await Rate.findOne({
       idUser: req.params.idUser,
       idGame: req.params.idGame,
     });
+
     if (findRate) {
-      res.send(
-        JSON.stringify({
-          score: findRate.score,
-        })
-      );
+      res.send({
+        score: findRate.score,
+      });
     } else {
       res.status(400).send("Game not found");
     }
