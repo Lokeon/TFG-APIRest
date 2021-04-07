@@ -127,6 +127,7 @@ router.get("/game/:id", verify, async (req, res) => {
   }
 });
 
+// POST Rate
 router.post("/rate", verify, async (req, res) => {
   try {
     const findRate = await Rate.findOne({
@@ -156,6 +157,7 @@ router.post("/rate", verify, async (req, res) => {
   }
 });
 
+// GET Score from Rated Game
 router.get("/rated/:idUser/:idGame", verify, async (req, res) => {
   try {
     const findRate = await Rate.findOne({
@@ -167,6 +169,23 @@ router.get("/rated/:idUser/:idGame", verify, async (req, res) => {
       res.send({
         score: findRate.score,
       });
+    } else {
+      res.status(400).send("Game not found");
+    }
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// GET Rates from User
+router.get("/rated", verify, async (req, res) => {
+  try {
+    const findRate = await Rate.find({
+      idUser: req.user,
+    });
+
+    if (findRate) {
+      res.send(findRate);
     } else {
       res.status(400).send("Game not found");
     }
