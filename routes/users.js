@@ -194,4 +194,17 @@ router.get("/rated", verify, async (req, res) => {
   }
 });
 
+// DELETE Rate
+router.delete("/rate/:nameGame", verify, async (req, res) => {
+  try {
+    const gameDeleted = await Rate.deleteOne({
+      idUser: req.user,
+      nameGame: req.params.nameGame,
+    });
+    res.send("Rate Deleted");
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 module.exports = router;
