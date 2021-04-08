@@ -207,4 +207,25 @@ router.delete("/rate/:nameGame", verify, async (req, res) => {
   }
 });
 
+// PATCH Rate score
+router.patch("/rate/update", verify, async (req, res) => {
+  try {
+    const updateRate = await Rate.updateOne(
+      {
+        idUser: req.user,
+        nameGame: req.body.nameGame,
+      },
+      {
+        $set: {
+          score: req.body.score,
+          date: Date.now(),
+        },
+      }
+    );
+    res.send("Rate Updated");
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 module.exports = router;
