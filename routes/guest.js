@@ -1,10 +1,16 @@
 const router = require("express").Router();
 const Game = require("../model/Games");
 
-//GET all Games
+//GET all Games Paged
 router.get("/games", async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+
   try {
-    const games = await Game.find();
+    const games = await Game.find()
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec();
+
     res.send(games);
   } catch (error) {
     res.status(400).send(error);

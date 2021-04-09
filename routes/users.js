@@ -73,9 +73,15 @@ router.patch("/avatar", verify, avatar.single("avatar"), async (req, res) => {
 
 //GET all Games
 router.get("/games", verify, async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+
   try {
-    const games = await Game.find();
-    res.send(games);
+    const games = await Game.find()
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec();
+
+      res.send(games);
   } catch (error) {
     res.status(400).send(error);
   }
