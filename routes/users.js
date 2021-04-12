@@ -81,7 +81,7 @@ router.get("/games", verify, async (req, res) => {
       .skip((page - 1) * limit)
       .exec();
 
-      res.send(games);
+    res.send(games);
   } catch (error) {
     res.status(400).send(error);
   }
@@ -103,6 +103,7 @@ router.get("/game/:id", verify, async (req, res) => {
       name: games.name,
       genre: games.genre,
       description: games.description,
+      platforms: games.platforms,
       image: games.image,
       avg: 0.0,
       rates: 0,
@@ -126,6 +127,7 @@ router.get("/game/:id", verify, async (req, res) => {
       name: games.name,
       genre: games.genre,
       description: games.description,
+      platforms: games.platforms,
       image: games.image,
       avg: avgGame[0].avgs,
       rates: rated,

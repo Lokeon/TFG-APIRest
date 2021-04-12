@@ -77,6 +77,7 @@ router.post("/games/game", image.single("image"), async (req, res) => {
     name: req.body.name,
     genre: req.body.genre,
     description: req.body.description,
+    platforms: req.body.platforms,
     image: req.file.buffer.toString("base64"),
   });
   try {

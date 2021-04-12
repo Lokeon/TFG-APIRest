@@ -23,8 +23,12 @@ const gameSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  platforms: {
+    type: String,
+    required: true,
+  },
 });
 
-gameSchema.index({ name: "text" });
+//gameSchema.index({ name: "text" });
 
 module.exports = mongoose.model("Game", gameSchema);
