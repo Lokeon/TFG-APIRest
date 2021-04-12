@@ -2,6 +2,7 @@ const router = require("express").Router();
 const Admin = require("../model/Admin");
 const User = require("../model/User");
 const Game = require("../model/Games");
+const Rate = require("../model/Rate");
 const multer = require("multer");
 const image = multer({
   limits: {
@@ -91,6 +92,9 @@ router.post("/games/game", image.single("image"), async (req, res) => {
 //DELETE Game
 router.delete("/games/delete/:id", async (req, res) => {
   try {
+    const ratesDeleted = await Rate.deleteMany({
+      idGame: req.params.id,
+    });
     const gameDeleted = await Game.deleteOne({ _id: req.params.id });
     res.send("Game Deleted");
   } catch (error) {
@@ -128,6 +132,16 @@ router.patch("/games/image/:id", image.single("image"), async (req, res) => {
     );
 
     res.send("Image updated");
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+//GET all Rates
+router.get("/rates", async (req, res) => {
+  try {
+    const rates = await Rate.find();
+    res.send(rates);
   } catch (error) {
     res.status(400).send(error);
   }
