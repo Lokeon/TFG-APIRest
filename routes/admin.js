@@ -121,17 +121,39 @@ router.put("/games/update/:id", async (req, res) => {
   }
 });
 
-// PATCH Game Image
+// PATCH Game
 router.patch("/games/image/:id", image.single("image"), async (req, res) => {
   try {
-    const gameUpdate = await Game.updateOne(
-      { _id: req.params.id },
-      {
-        $set: { image: req.file.buffer.toString("base64") },
-      }
-    );
+    if (req.file == undefined) {
+      const gameUpdate = await Game.updateOne(
+        { _id: req.params.id },
+        {
+          $set: {
+            name: req.body.name,
+            genre: req.body.genre,
+            description: req.body.description,
+            platforms: req.body.platforms,
+          },
+        }
+      );
 
-    res.send("Image updated");
+      res.send("Game updated");
+    } else {
+      const gameUpdate = await Game.updateOne(
+        { _id: req.params.id },
+        {
+          $set: {
+            image: req.file.buffer.toString("base64"),
+            name: req.body.name,
+            genre: req.body.genre,
+            description: req.body.description,
+            platforms: req.body.platforms,
+          },
+        }
+      );
+
+      res.send("Game updated");
+    }
   } catch (error) {
     res.status(400).send(error);
   }
@@ -170,7 +192,7 @@ router.get("/rated5", async (req, res) => {
 // GET Top 5 Rates - best avgs
 router.get("/avg5", async (req, res) => {
   try {
-    const mostVoted = await Rate.aggregate()
+    const bestAvg = await Rate.aggregate()
       .match({})
       .group({
         _id: "$nameGame",
@@ -181,7 +203,7 @@ router.get("/avg5", async (req, res) => {
       })
       .limit(5);
 
-    res.send(mostVoted);
+    res.send(bestAvg);
   } catch (error) {
     res.status(400).send(error);
   }
