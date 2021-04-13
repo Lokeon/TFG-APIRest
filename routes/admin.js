@@ -147,4 +147,44 @@ router.get("/rates", async (req, res) => {
   }
 });
 
+// GET Top 5 Rates - most voted
+router.get("/rated5", async (req, res) => {
+  try {
+    const mostVoted = await Rate.aggregate()
+      .match({})
+      .group({
+        _id: "$nameGame",
+        votes: { $sum: 1 },
+      })
+      .sort({
+        votes: -1,
+      })
+      .limit(5);
+
+    res.send(mostVoted);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// GET Top 5 Rates - best avgs
+router.get("/avg5", async (req, res) => {
+  try {
+    const mostVoted = await Rate.aggregate()
+      .match({})
+      .group({
+        _id: "$nameGame",
+        avgs: { $avg: "$score" },
+      })
+      .sort({
+        avgs: -1,
+      })
+      .limit(5);
+
+    res.send(mostVoted);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 module.exports = router;
