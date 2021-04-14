@@ -138,7 +138,7 @@ router.get("/game/:id", verify, async (req, res) => {
       description: games.description,
       platforms: games.platforms,
       image: games.image,
-      avg: avgGame[0].avgs,
+      avg: Math.round((avgGame[0].avgs + Number.EPSILON) * 100) / 100,
       rates: rated,
     });
   }
