@@ -6,7 +6,6 @@ const Rate = require("../model/Rate");
 const Petition = require("../model/Petitions");
 const verify = require("./verifyToken");
 const multer = require("multer");
-const { find } = require("../model/User");
 const avatar = multer({
   limits: {
     filesize: 5000000,
@@ -265,6 +264,75 @@ router.post("/petition", verify, async (req, res) => {
         res.status(200).send(savedPetition);
       }
     }
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+router.get("/rate/refresh/:id", verify, async (req, res) => {
+  try {
+    const avgGame = await Rate.aggregate()
+      .match({
+        idGame: req.params.id,
+      })
+      .group({
+        _id: null,
+        avgs: { $avg: "$score" },
+      });
+
+    const rated = await Rate.countDocuments({
+      idGame: req.params.id,
+    });
+
+    res.status(200).send({
+      avg: avgGame[0].avgs,
+      rates: rated,
+    });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+router.get("/bestgames", verify, async (req, res) => {
+  try {
+    const mostVoted = await Rate.aggregate()
+      .match({})
+      .group({
+        _id: "$nameGame",
+        votes: { $sum: 1 },
+      })
+      .sort({
+        votes: -1,
+      })
+      .limit(1);
+
+    const mostVotedImg = await Game.findOne({
+      name: mostVoted[0]._id,
+    });
+
+    const bestAvg = await Rate.aggregate()
+      .match({})
+      .group({
+        _id: "$nameGame",
+        avgs: { $avg: "$score" },
+      })
+      .sort({
+        avgs: -1,
+      })
+      .limit(1);
+
+    const bestAvgImg = await Game.findOne({
+      name: bestAvg[0]._id,
+    });
+
+    res.status(200).send({
+      idMostVoted: mostVotedImg._id,
+      mostVoted: mostVoted[0]._id,
+      mostVotedImg: mostVotedImg.image,
+      idMostAvg: bestAvgImg._id,
+      mostAvg: bestAvg[0]._id,
+      mostAvgImg: bestAvgImg.image,
+    });
   } catch (error) {
     res.status(400).send(error);
   }
