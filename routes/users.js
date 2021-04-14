@@ -54,7 +54,7 @@ router.patch("/password", verify, async (req, res) => {
     const user = await User.findOne({
       _id: req.user,
     });
-    
+
     changedPassword(user.username, user.email);
     res.send(req.user);
   } catch (error) {
@@ -84,10 +84,12 @@ router.get("/games", verify, async (req, res) => {
 
   try {
     const games = await Game.find()
+      .sort({
+        date: -1,
+      })
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .exec();
-
     res.send(games);
   } catch (error) {
     res.status(400).send(error);

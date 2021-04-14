@@ -7,6 +7,9 @@ router.get("/games", async (req, res) => {
 
   try {
     const games = await Game.find()
+      .sort({
+        date: -1,
+      })
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .exec();
