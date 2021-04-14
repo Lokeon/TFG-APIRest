@@ -82,8 +82,18 @@ router.post("/games/game", image.single("image"), async (req, res) => {
     platforms: req.body.platforms,
     image: req.file.buffer.toString("base64"),
   });
+
+  const petitionDelete = await Petition.findOne({
+    nameGame: req.body.name,
+  });
+
   try {
+    if (petitionDelete)
+      await Petition.deleteOne({
+        nameGame: req.body.name,
+      });
     const savedGame = await game.save();
+
     res.send(savedGame);
   } catch (error) {
     res.status(400).send(error);
