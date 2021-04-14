@@ -6,6 +6,7 @@ const Rate = require("../model/Rate");
 const Petition = require("../model/Petitions");
 const verify = require("./verifyToken");
 const multer = require("multer");
+const { changedPassword } = require("../config/nodemailer.config");
 const avatar = multer({
   limits: {
     filesize: 5000000,
@@ -49,6 +50,12 @@ router.patch("/password", verify, async (req, res) => {
         $set: { password: hashPassword },
       }
     );
+
+    const user = await User.findOne({
+      _id: req.user,
+    });
+    
+    changedPassword(user.username, user.email);
     res.send(req.user);
   } catch (error) {
     res.status(400).send(error);

@@ -39,5 +39,19 @@ const confirmedEmail = (username, email) => {
   });
 };
 
+const changedPassword = (username, email) => {
+  transport.sendMail({
+    from: "noreplay@gmail.com",
+    to: email,
+    subject: "Password has been changed!",
+    html: `<h1> Password changed </h1>
+             <h2> Hello ${username} </h2>
+             <p> Your password has been changed and you can sign in! </p>
+             </div>
+      `,
+  });
+};
+
 module.exports.sendConfirmationEmail = sendConfirmationEmail;
 module.exports.confirmedEmail = confirmedEmail;
+module.exports.changedPassword = changedPassword;
