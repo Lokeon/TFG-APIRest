@@ -4,7 +4,10 @@ const User = require("../model/User");
 const Game = require("../model/Games");
 const Rate = require("../model/Rate");
 const Petition = require("../model/Petitions");
+const dotenv = require("dotenv").config();
 const multer = require("multer");
+const firebase = require("firebase-admin");
+const serviceAccount = require(process.env.PATH_FIREBASE);
 const image = multer({
   limits: {
     filesize: 5000000,
@@ -14,6 +17,10 @@ const image = multer({
       return cb(new Error("Format file is not correct"));
     cb(undefined, true);
   },
+});
+
+firebase.initializeApp({
+  credential: firebase.credential.cert(serviceAccount),
 });
 
 //GET all Admin
@@ -75,6 +82,14 @@ router.post("/games/game", image.single("image"), async (req, res) => {
   });
   if (gameExits) return res.status(400).send("Game already exists");
 
+  const message = {
+    notification: {
+      title: "New Game",
+      body: req.body.name + " has been added",
+    },
+    topic: "game",
+  };
+
   const game = new Game({
     name: req.body.name,
     genre: req.body.genre,
@@ -93,6 +108,15 @@ router.post("/games/game", image.single("image"), async (req, res) => {
         nameGame: req.body.name,
       });
     const savedGame = await game.save();
+    firebase
+      .messaging()
+      .send(message)
+      .then((response) => {
+        console.log("Message sent: ", response);
+      })
+      .catch((error) => {
+        console.log("Error", error);
+      });
 
     res.send(savedGame);
   } catch (error) {
