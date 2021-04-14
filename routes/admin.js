@@ -3,6 +3,7 @@ const Admin = require("../model/Admin");
 const User = require("../model/User");
 const Game = require("../model/Games");
 const Rate = require("../model/Rate");
+const Petition = require("../model/Petitions");
 const multer = require("multer");
 const image = multer({
   limits: {
@@ -209,4 +210,35 @@ router.get("/avg5", async (req, res) => {
   }
 });
 
+//GET all Petitions
+router.get("/petition", async (req, res) => {
+  try {
+    const petitions = await Petition.find();
+    res.send(petitions);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+//DELETE Game
+router.delete("/petition/delete/:id", async (req, res) => {
+  try {
+    const petitionDeleted = await Petition.deleteOne({ _id: req.params.id });
+    res.send("Petition Deleted");
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+//GET petition count
+router.get("/petition/check", async (req, res) => {
+  try {
+    const petitions = await Petition.countDocuments();
+    res.send({
+      totalPetitions: petitions,
+    });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
 module.exports = router;

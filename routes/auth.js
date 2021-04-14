@@ -20,7 +20,11 @@ router.post("/register/users", async (req, res) => {
   const { error } = registerUserValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  //Check username exists
+  const emailExists = await User.findOne({
+    email: req.body.email,
+  });
+  if (emailExists) return res.status(400).send("Email already exists");
+
   const usernameExists = await User.findOne({
     username: req.body.username,
   });
@@ -45,11 +49,7 @@ router.post("/register/users", async (req, res) => {
   });
   try {
     const savedUser = await user.save();
-    sendConfirmationEmail(
-      req.body.username,
-      req.body.email,
-      token
-    );
+    sendConfirmationEmail(req.body.username, req.body.email, token);
     res.send(savedUser);
   } catch (e) {
     res.status(400).send(e);
@@ -61,7 +61,6 @@ router.post("/register/admins", async (req, res) => {
   const { error } = registerAdminValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  //Check username exists
   const usernameExists = await Admin.findOne({
     username: req.body.username,
   });
@@ -106,7 +105,7 @@ router.get("/confirm/:code", async (req, res) => {
 router.post("/login/users", async (req, res) => {
   const { error } = loginValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  //Check username exists
+
   const user = await User.findOne({
     username: req.body.username,
   });
@@ -134,7 +133,7 @@ router.post("/login/users", async (req, res) => {
 router.post("/login/admins", async (req, res) => {
   const { error } = loginValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  //Check username exists
+
   const admin = await Admin.findOne({
     username: req.body.username,
   });

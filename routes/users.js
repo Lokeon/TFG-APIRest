@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../model/User");
 const Game = require("../model/Games");
 const Rate = require("../model/Rate");
+const Petition = require("../model/Petitions");
 const verify = require("./verifyToken");
 const multer = require("multer");
 const { find } = require("../model/User");
@@ -71,7 +72,7 @@ router.patch("/avatar", verify, avatar.single("avatar"), async (req, res) => {
   }
 });
 
-//GET all Games
+//GET all Games with pagination
 router.get("/games", verify, async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 
@@ -231,6 +232,39 @@ router.patch("/rate/update", verify, async (req, res) => {
       }
     );
     res.send("Rate Updated");
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+// POST Petition
+router.post("/petition", verify, async (req, res) => {
+  try {
+    const findGame = await Game.findOne({
+      name: req.body.nameGame,
+    });
+
+    if (findGame) {
+      return res.status(400).send("Game already exists");
+    } else {
+      const findPetition = await Petition.findOne({
+        nameGame: req.body.nameGame,
+      });
+
+      if (findPetition) {
+        return res
+          .status(400)
+          .send("Game already registered. It is going to be added soon!!");
+      }
+      {
+        const petition = new Petition({
+          nameGame: req.body.nameGame,
+        });
+
+        const savedPetition = await petition.save();
+        res.status(200).send(savedPetition);
+      }
+    }
   } catch (error) {
     res.status(400).send(error);
   }
