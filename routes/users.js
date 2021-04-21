@@ -4,9 +4,11 @@ const User = require("../model/User");
 const Game = require("../model/Games");
 const Rate = require("../model/Rate");
 const Petition = require("../model/Petitions");
+const Recommendation = require("../model/Recommendation");
 const verify = require("./verifyToken");
 const multer = require("multer");
 const { changedPassword } = require("../config/nodemailer.config");
+const Games = require("../model/Games");
 const avatar = multer({
   limits: {
     filesize: 5000000,
@@ -278,6 +280,7 @@ router.post("/petition", verify, async (req, res) => {
   }
 });
 
+// GET Refresh Rates
 router.get("/rate/refresh/:id", verify, async (req, res) => {
   try {
     const avgGame = await Rate.aggregate()
@@ -302,6 +305,7 @@ router.get("/rate/refresh/:id", verify, async (req, res) => {
   }
 });
 
+//GET Best Avg Game && Most Voted
 router.get("/bestgames", verify, async (req, res) => {
   try {
     const mostVoted = await Rate.aggregate()
@@ -341,6 +345,38 @@ router.get("/bestgames", verify, async (req, res) => {
       idMostAvg: bestAvgImg._id,
       mostAvg: bestAvg[0]._id,
       mostAvgImg: bestAvgImg.image,
+    });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+//GET Recommendations
+router.get("/recommendations", verify, async (req, res) => {
+  try {
+    const recommendations = await Recommendation.find({
+      idUser: req.user,
+    });
+
+    console.log(recommendations);
+
+    const games = await Games.find({
+      name: [
+        recommendations[0].nameGame,
+        recommendations[1].nameGame,
+        recommendations[2].nameGame,
+      ],
+    });
+    res.send({
+      idGame1: games[0]._id,
+      nameGame1: games[0].name,
+      image1: games[0].image,
+      idGame2: games[1]._id,
+      nameGame2: games[1].name,
+      image2: games[1].image,
+      idGame3: games[2]._id,
+      nameGame3: games[2].name,
+      image3: games[2].image,
     });
   } catch (error) {
     res.status(400).send(error);
