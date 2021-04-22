@@ -6,6 +6,7 @@ const Rate = require("../model/Rate");
 const Petition = require("../model/Petitions");
 const Recommendation = require("../model/Recommendation");
 const verify = require("./verifyToken");
+const { spawn } = require("child_process");
 const multer = require("multer");
 const { changedPassword } = require("../config/nodemailer.config");
 const Games = require("../model/Games");
@@ -354,6 +355,12 @@ router.get("/bestgames", verify, async (req, res) => {
 //GET Recommendations
 router.get("/recommendations", verify, async (req, res) => {
   try {
+    const python = spawn("python", ["./recosys/recosys.py", id.req]);
+
+    python.on("close", (code) => {
+      console.log("child process close all stdio with code ${code}");
+    });
+
     const recommendations = await Recommendation.find({
       idUser: req.user,
     });
