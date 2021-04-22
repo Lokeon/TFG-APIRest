@@ -7,7 +7,7 @@ const Petition = require("../model/Petitions");
 const dotenv = require("dotenv").config();
 const multer = require("multer");
 const firebase = require("firebase-admin");
-const serviceAccount = require(process.env.PATH_FIREBASE);
+const serviceAccount = JSON.parse(process.env.PATH_FIREBASE);
 const image = multer({
   limits: {
     filesize: 5000000,
