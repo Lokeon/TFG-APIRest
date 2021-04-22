@@ -4,9 +4,8 @@ const User = require("../model/User");
 const Game = require("../model/Games");
 const Rate = require("../model/Rate");
 const Petition = require("../model/Petitions");
-const Recommendation = require("../model/Recommendation");
+const { PythonShell } = require("python-shell");
 const verify = require("./verifyToken");
-const { spawn } = require("child_process");
 const multer = require("multer");
 const { changedPassword } = require("../config/nodemailer.config");
 const Games = require("../model/Games");
@@ -354,38 +353,16 @@ router.get("/bestgames", verify, async (req, res) => {
 
 //GET Recommendations
 router.get("/recommendations", verify, async (req, res) => {
-  try {
-    const python = spawn("python", ["./recosys/recosys.py", id.req]);
+  var options = {
+    mode: "text",
+    args: [req.user._id],
+  };
 
-    python.on("close", (code) => {
-      console.log("child process close all stdio with code ${code}");
-    });
-
-    const recommendations = await Recommendation.find({
-      idUser: req.user,
-    });
-
-    const games = await Games.find({
-      name: [
-        recommendations[0].nameGame,
-        recommendations[1].nameGame,
-        recommendations[2].nameGame,
-      ],
-    });
-    res.send({
-      idGame1: games[0]._id,
-      nameGame1: games[0].name,
-      image1: games[0].image,
-      idGame2: games[1]._id,
-      nameGame2: games[1].name,
-      image2: games[1].image,
-      idGame3: games[2]._id,
-      nameGame3: games[2].name,
-      image3: games[2].image,
-    });
-  } catch (error) {
-    res.status(400).send(error);
-  }
+  PythonShell.run("./recosys/recosys.py", options, function (err, results) {
+    if (err) throw err;
+    // results is an array consisting of messages collected during execution
+    res.send(JSON.parse(results));
+  });
 });
 
 module.exports = router;
