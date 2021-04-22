@@ -358,8 +358,6 @@ router.get("/recommendations", verify, async (req, res) => {
       idUser: req.user,
     });
 
-    console.log(recommendations);
-
     const games = await Games.find({
       name: [
         recommendations[0].nameGame,

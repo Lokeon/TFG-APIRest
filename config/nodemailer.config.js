@@ -17,7 +17,7 @@ const sendConfirmationEmail = (username, email, confirmationCode) => {
       html: `<h1> Email Confirmation </h1>
                <h2> Hello ${username} </h2>
                <p> Please confirm your email by clicking on the following link </p>
-               <a href=http://${process.env.IP}:3000/api/auth/confirm/${confirmationCode}> Click here </a>
+               <a href=https://tfg-recosys.herokuapp.com/api/auth/confirm/${confirmationCode}> Click here </a>
                </div>
         `,
     });
