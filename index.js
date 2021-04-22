@@ -31,4 +31,6 @@ app.use("/api/users", userRoute);
 app.use("/api/admins", adminRoute);
 app.use("/api/guest", guestRoute);
 
-app.listen(3000, () => console.log("Server up and running"));
+app.listen(process.env.PORT || 3000, () =>
+  console.log("Server up and running")
+);
