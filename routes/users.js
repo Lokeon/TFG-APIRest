@@ -357,16 +357,27 @@ router.get("/bestgames", verify, async (req, res) => {
 
 //GET Recommendations
 router.get("/recommendations", verify, async (req, res) => {
-  var options = {
-    mode: "text",
-    args: [req.user._id],
-  };
+  try {
+    const totalRates = await Rate.countDocuments({
+      idUser: req.user,
+    });
 
-  PythonShell.run("./recosys/recosys.py", options, function (err, results) {
-    if (err) throw err;
-    // results is an array consisting of messages collected during execution
-    res.send(JSON.parse(results));
-  });
+    if (totalRates >= 5) {
+      const options = {
+        mode: "text",
+        args: [req.user._id],
+      };
+
+      PythonShell.run("./recosys/recosys.py", options, function (err, results) {
+        if (err) throw err;
+        res.send(JSON.parse(results));
+      });
+    } else {
+      res.status(402).send("You need at least rate 5 games");
+    }
+  } catch (error) {
+    res.status(400).send(error);
+  }
 });
 
 module.exports = router;
