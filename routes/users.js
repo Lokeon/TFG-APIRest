@@ -82,8 +82,7 @@ router.patch("/avatar", verify, avatar.single("avatar"), async (req, res) => {
 
 //GET all Games with pagination
 router.get("/games", verify, async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
-
+  const { page = 1, limit = 9 } = req.query;
   try {
     const games = await Game.find()
       .sort({
@@ -92,7 +91,12 @@ router.get("/games", verify, async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .exec();
-    res.send(games);
+
+    if (Object.keys(games).length == 0) {
+      res.status(400).send("No more Games");
+    } else {
+      res.send(games);
+    }
   } catch (error) {
     res.status(400).send(error);
   }

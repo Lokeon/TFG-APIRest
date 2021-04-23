@@ -3,8 +3,7 @@ const Game = require("../model/Games");
 
 //GET all Games Paged
 router.get("/games", async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
-
+  const { page = 1, limit = 9 } = req.query;
   try {
     const games = await Game.find()
       .sort({
@@ -14,7 +13,11 @@ router.get("/games", async (req, res) => {
       .skip((page - 1) * limit)
       .exec();
 
-    res.send(games);
+    if (Object.keys(games).length == 0) {
+      res.status(400).send("No more Games");
+    } else {
+      res.send(games);
+    }
   } catch (error) {
     res.status(400).send(error);
   }
