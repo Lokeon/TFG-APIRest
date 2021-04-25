@@ -109,11 +109,11 @@ router.post("/login/users", async (req, res) => {
   const user = await User.findOne({
     username: req.body.username,
   });
-  if (!user) return res.status(400).send("Username doesn't exists");
-  if (user.isConfirmed) {
-    const validPass = await bcrypt.compare(req.body.password, user.password);
-    if (!validPass) return res.status(400).send("Invalid password");
+  const validPass = await bcrypt.compare(req.body.password, user.password);
+  if (!user || !validPass)
+    return res.status(400).send("Username or Password isn't correct!!");
 
+  if (user.isConfirmed) {
     //Create jwt token
     const token = jwt.sign(
       {
