@@ -57,7 +57,7 @@ router.patch("/password", verify, async (req, res) => {
       _id: req.user,
     });
 
-    await changedPassword(user.username, user.email);
+    changedPassword(user.username, user.email);
     res.send(req.user);
   } catch (error) {
     res.status(400).send(error);
