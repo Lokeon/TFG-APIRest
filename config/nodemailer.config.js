@@ -41,5 +41,4 @@ const changedPassword = (username, email) => {
 };
 
 module.exports.sendConfirmationEmail = sendConfirmationEmail;
-module.exports.confirmedEmail = confirmedEmail;
 module.exports.changedPassword = changedPassword;
