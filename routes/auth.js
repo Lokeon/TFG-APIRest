@@ -49,7 +49,7 @@ router.post("/register/users", async (req, res) => {
   });
   try {
     const savedUser = await user.save();
-    sendConfirmationEmail(req.body.username, req.body.email, token);
+    await sendConfirmationEmail(req.body.username, req.body.email, token);
     res.send(savedUser);
   } catch (e) {
     res.status(400).send(e);
@@ -94,7 +94,7 @@ router.get("/confirm/:code", async (req, res) => {
 
     user.isConfirmed = true;
     const savedUser = await user.save();
-    confirmedEmail(user.username, user.email);
+    await confirmedEmail(user.username, user.email);
   } catch (error) {
     res.status(400).send(error);
   }

@@ -5,7 +5,7 @@ const transport = nodemailer.createTransport(
   sng({ auth: { api_key: process.env.SNG_API_KEY } })
 );
 
-const sendConfirmationEmail = (username, email, confirmationCode) => {
+const sendConfirmationEmail = async (username, email, confirmationCode) => {
   try {
     transport.sendMail({
       from: "recosysgame@gmail.com",
@@ -18,25 +18,29 @@ const sendConfirmationEmail = (username, email, confirmationCode) => {
                </div>
         `,
     });
+    transport.close();
   } catch (error) {
     console.log(error);
   }
 };
 
-const confirmedEmail = (username, email) => {
-  transport.sendMail({
-    from: "recosysgame@gmail.com",
-    to: email,
-    subject: "Account has been verified!",
-    html: `<h1> Account verified </h1>
+const confirmedEmail = async (username, email) => {
+  try {
+    transport.sendMail({
+      from: "recosysgame@gmail.com",
+      to: email,
+      subject: "Account has been verified!",
+      html: `<h1> Account verified </h1>
              <h2> Hello ${username} </h2>
              <p> Your account has been verified and you can sign in! </p>
              </div>
       `,
-  });
+    });
+    transport.close();
+  } catch (error) {}
 };
 
-const changedPassword = (username, email) => {
+const changedPassword = async (username, email) => {
   transport.sendMail({
     from: "recosysgame@gmail.com",
     to: email,
