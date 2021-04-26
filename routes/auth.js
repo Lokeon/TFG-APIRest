@@ -95,7 +95,6 @@ router.get("/confirm/:code", async (req, res) => {
     user.isConfirmed = true;
     const savedUser = await user.save();
     confirmedEmail(user.username, user.email);
-    res.send("User confimed");
   } catch (error) {
     res.status(400).send(error);
   }
