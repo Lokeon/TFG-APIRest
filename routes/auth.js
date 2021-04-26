@@ -82,7 +82,7 @@ router.post("/register/admins", async (req, res) => {
 });
 
 //Confirm Email
-router.post("/confirm/:code", async (req, res) => {
+router.get("/confirm/:code", async (req, res) => {
   try {
     const user = await User.findOne({ confirmationCode: req.params.code });
     if (!user) return res.status(400).send("User not found");
@@ -94,7 +94,7 @@ router.post("/confirm/:code", async (req, res) => {
 
     user.isConfirmed = true;
     const savedUser = await user.save();
-    confirmedEmail(user.username, user.email);
+    res.send("User confirmed");
   } catch (error) {
     res.status(400).send(error);
   }
