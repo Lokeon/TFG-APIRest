@@ -1,17 +1,14 @@
 const nodemailer = require("nodemailer");
+const sng = require("nodemailer-sendgrid-transport");
 const dotenv = require("dotenv").config;
-const transport = nodemailer.createTransport({
-  service: "Gmail",
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.PASS,
-  },
-});
+const transport = nodemailer.createTransport(
+  sng({ auth: { api_key: process.env.SNG_API_KEY } })
+);
 
 const sendConfirmationEmail = (username, email, confirmationCode) => {
   try {
     transport.sendMail({
-      from: "noreplay@gmail.com",
+      from: "recosysgame@gmail.com",
       to: email,
       subject: "Confirm your account!",
       html: `<h1> Email Confirmation </h1>
@@ -28,7 +25,7 @@ const sendConfirmationEmail = (username, email, confirmationCode) => {
 
 const confirmedEmail = (username, email) => {
   transport.sendMail({
-    from: "noreplay@gmail.com",
+    from: "recosysgame@gmail.com",
     to: email,
     subject: "Account has been verified!",
     html: `<h1> Account verified </h1>
@@ -41,7 +38,7 @@ const confirmedEmail = (username, email) => {
 
 const changedPassword = (username, email) => {
   transport.sendMail({
-    from: "noreplay@gmail.com",
+    from: "recosysgame@gmail.com",
     to: email,
     subject: "Password has been changed!",
     html: `<h1> Password changed </h1>
