@@ -23,23 +23,6 @@ const sendConfirmationEmail = (username, email, confirmationCode) => {
   }
 };
 
-const confirmedEmail = (username, email) => {
-  try {
-    transport.sendMail({
-      from: "recosysgame@gmail.com",
-      to: email,
-      subject: "Account has been verified!",
-      html: `<h1> Account verified </h1>
-             <h2> Hello ${username} </h2>
-             <p> Your account has been verified and you can sign in! </p>
-             </div>
-      `,
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 const changedPassword = (username, email) => {
   try {
     transport.sendMail({
